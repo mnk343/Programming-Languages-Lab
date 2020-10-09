@@ -1,0 +1,5 @@
+170101038,Amit Kumar Sharma,amit55@iitg.ac.in,86,CC
+170101035,Abdul Najim,abdul12@iitg.ac.in,93,CC
+170101002,Kunal Kishore,kunal58@iitg.ac.in,101,CC
+170101045,Subhra Shivani,subhra33@iitg.ac.in,82,TA1
+170101006,Savnam Khatam,savanam35@iig.ac.in,63,CC
