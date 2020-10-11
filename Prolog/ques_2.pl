@@ -16,15 +16,35 @@ print_optimal_route([Head | Tail]) :-
 
 find_properties( [BusNumber | []], Distance, Cost, Time) :- 
 	bus(BusNumber, Start, End, DeptTime, ArrivalTime, BusDistance, BusCost),
+	ArrivalTime >= DeptTime,
 	Distance is BusDistance,
 	Time is ArrivalTime - DeptTime,
 	Cost is BusCost.
 
+find_properties( [BusNumber | []], Distance, Cost, Time) :- 
+	bus(BusNumber, Start, End, DeptTime, ArrivalTime, BusDistance, BusCost),
+	ArrivalTime < DeptTime,
+	Distance is BusDistance,
+	X is DeptTime - ArrivalTime,
+	Time is 24 - X,
+	Cost is BusCost.
+
 find_properties( [BusNumber | Tail], Distance, Cost, Time) :- 
 	bus(BusNumber, Start, End, DeptTime, ArrivalTime, BusDistance, BusCost),
+	ArrivalTime >= DeptTime,
 	find_properties( Tail, IntermediateDistance, IntermediateCost, IntermediateTime),
 	Distance is BusDistance + IntermediateDistance,
 	X is ArrivalTime - DeptTime,
+	Time is X + IntermediateTime,
+	Cost is BusCost + IntermediateCost.
+
+find_properties( [BusNumber | Tail], Distance, Cost, Time) :- 
+	bus(BusNumber, Start, End, DeptTime, ArrivalTime, BusDistance, BusCost),
+	ArrivalTime < DeptTime,
+	find_properties( Tail, IntermediateDistance, IntermediateCost, IntermediateTime),
+	Distance is BusDistance + IntermediateDistance,
+	Temp is DeptTime - ArrivalTime ,
+	X is 24 - Temp,
 	Time is X + IntermediateTime,
 	Cost is BusCost + IntermediateCost.
 
@@ -33,7 +53,7 @@ print_properties( OptimalRoute ) :-
 	format('Distance=~w, Cost=~w, Time=~w ', [Distance, Cost, Time]).
 
 print_optimal_set_with_properties( OptimalRoute ) :-
-	print_optimal_route( OptimalRoute ),
+	print_optimal_route( OptimalRoute ),nl,
 	print_properties( OptimalRoute ).
 
 find_minimum_set([[Path,Value] | Tail], OptimalRoute ) :-
@@ -82,20 +102,65 @@ find_route_by_cost(Start, End, Route, VisitedBusStops, Cost):-
 	Cost is BusCost + NewCost,
 	append([BusNumber], IntermediateRoute ,Route).
 
+
+
+
+
+optimal_route_time(Start, End, RequiredRoute, Time ):-
+	find_route_by_time(Start, End, RequiredRoute, [Start], Time ).
+
+find_route_by_time(Start, End, Route, VisitedBusStops, Time):-
+	bus(BusNumber, Start, End, StartTime, EndTime, _, _),
+	EndTime >= StartTime,
+	Time is EndTime - StartTime,
+	append([], [BusNumber] ,Route).
+
+find_route_by_time(Start, End, Route, VisitedBusStops, Time):-
+	bus(BusNumber, Start, End, StartTime, EndTime, _, _),
+	EndTime < StartTime,
+	X is StartTime - EndTime,
+	Time is 24 - X,
+	append([], [BusNumber] ,Route).
+
+find_route_by_time(Start, End, Route, VisitedBusStops, Time):-
+	bus(BusNumber, Start, Intermediate, StartTime, EndTime, _, _),
+	EndTime >= StartTime,
+	\+member(Intermediate,VisitedBusStops),
+	find_route_by_time( Intermediate, End, IntermediateRoute, [Intermediate|VisitedBusStops], NewTime ),
+	X is EndTime - StartTime,
+	Time is NewTime + X ,
+	append([BusNumber], IntermediateRoute ,Route).
+
+
+find_route_by_time(Start, End, Route, VisitedBusStops, Time):-
+	bus(BusNumber, Start, Intermediate, StartTime, EndTime, _, _),
+	EndTime < StartTime,
+	\+member(Intermediate,VisitedBusStops),
+	find_route_by_time( Intermediate, End, IntermediateRoute, [Intermediate|VisitedBusStops], NewTime ),
+	X is StartTime - EndTime,
+	Y is 24 - X,
+	Time is NewTime + Y,
+	append([BusNumber], IntermediateRoute ,Route).
+
+
 optimal_route( Start, End ):-
 	setof([Route,Distance], optimal_route_distance(Start,End, Route,Distance),Set_Distance),
 	find_minimum_set(Set_Distance, OptimalRoute_Distance ),
 	
-	write('Optimum Distance: '),nl,
+	nl,nl,write('Optimum Distance: '),nl,
 	print_optimal_set_with_properties(OptimalRoute_Distance),
 
 	setof([Route,Cost], optimal_route_cost(Start,End, Route,Cost),Set_Cost),
 	find_minimum_set(Set_Cost, OptimalRoute_Cost ),
 	
-	write('Optimum Cost: '),nl,
-	print_optimal_set_with_properties(OptimalRoute_Cost).
+	nl,nl,write('Optimum Cost: '),nl,
+	print_optimal_set_with_properties(OptimalRoute_Cost),
 
+	setof([Route,Time], optimal_route_time(Start,End, Route,Time),Set_Time),
+	find_minimum_set(Set_Time, OptimalRoute_Time),
 
+	nl,nl,write('Optimum Time: '),nl,
+	print_optimal_set_with_properties(OptimalRoute_Time).
 
 
 
