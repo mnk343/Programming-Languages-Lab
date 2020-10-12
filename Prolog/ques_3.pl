@@ -69,20 +69,43 @@ print_route([Head | Tail]) :-
 	format('~w -> ' , [Head]),
 	print_route(Tail).
 
-find_possible_paths_from_starting_node([ Head | [] ] , SetOfPaths):-
+addStartVertexToPaths( Start, [ [Head,Length] | [] ], SetOfPathsWithStart ) :-
+	append( [Start], Head, PathWithStart),
+	append([] , [PathWithStart, Length], SetOfPathsWithStart ).
+	% print_route( PathWithStart).
 
-find_possible_paths_from_starting_node([ Head | Tail] , SetOfPaths):-
+addStartVertexToPaths( Start, [ [Head,Length] | Tail ], SetOfPathsWithStart ) :-
+	addStartVertexToPaths( Start, Tail, IntermediateSetOfPaths ),
+	append( [Start], Head, PathWithStart),
+	append(IntermediateSetOfPaths , [PathWithStart,Length], SetOfPathsWithStart ).
+
+find_possible_paths_from_starting_node([ Start | [] ] , TotalSetOfPaths):-
+	setof( [Route, Length], find_path( Start, 'G17', Route, [Start], Length ), SetOfPaths),
+	% print_routes(SetOfPaths),
+	addStartVertexToPaths( Start, SetOfPaths, SetOfPathsWithStart ),
+
+	append( SetOfPathsWithStart,[], TotalSetOfPaths).
+	% print_all_routes( SetOfPathsWithStart ).
+
+find_possible_paths_from_starting_node([ Start | Tail] , TotalSetOfPaths):-
+	find_possible_paths_from_starting_node( Tail , IntermediateSetOfPaths),
+
+	setof( [Route, Length], find_path( Start, 'G17', Route, [Start], Length ), SetOfPaths),
+	addStartVertexToPaths( Start, SetOfPaths, SetOfPathsWithStart ),
+	
+	append( SetOfPathsWithStart , IntermediateSetOfPaths , TotalSetOfPaths ).
+	% print_all_routes( SetOfPaths ).
 
 all_possible_paths:-
 	setof(X, startNode(X), SetOfStartingNodes),
-	find_possible_paths_from_starting_node(SetOfStartingNodes, SetOfPaths),
-	print_all_routes( SetOfPaths ).
+	find_possible_paths_from_starting_node(SetOfStartingNodes, TotalSetOfPaths),
+	print_all_routes( TotalSetOfPaths ).
 
-all_possible_paths :-
-	setof( [Route, Length], find_paths_from_starting_node( Start, 'G17', Route, [Start], Length ), SetOfPaths),
-	length(SetOfPaths, X),
-	format('~w ', [X]),
-	print_all_routes( SetOfPaths ).
+% all_possible_paths :-
+% 	setof( [Route, Length], find_path( Start, 'G17', Route, [Start], Length ), SetOfPaths),
+% 	length(SetOfPaths, X),
+% 	format('~w ', [X]),
+% 	print_all_routes( SetOfPaths ).
 
 optimal(Start) :-
 	setof( [Route, Length], find_path( Start, 'G17', Route, [Start], Length ), SetOfPaths),
