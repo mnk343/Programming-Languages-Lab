@@ -20,8 +20,8 @@ bus(123,'Amingaon','Jalukbari',14.5,15,10,10).
 bus(561,'Jalukbari','Khoka', 15,23,3,5).
 bus(216,'Khoka','Lokhra', 15,11,9,3).
 bus(756,'Panbazar','Chandmari',16,16.5,7,8).
-bus(356,'Khoka','Chandmari', 12,11,9,6).
-bus(111,'Amingaon','Khoka',16,15.5,20,8).
+bus(356,'Khoka','Chandmari', 20,21,9,6).
+bus(111,'Amingaon','Khoka',16,16.5,30,8).
 
 % This clause is the base case for recursion in printing the optimal path,
 % Given the only element in the array, we print the required Start and End bus stops
