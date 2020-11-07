@@ -56,6 +56,7 @@ find_path( Start, End, Route, VisitedNodes, Length ) :-
 
 find_path( Start, End, Route, VisitedNodes, Length ) :-
 	edge( Start, Intermediate, Weight),
+	Intermediate\==End,
 	\+ (member(Intermediate, VisitedNodes)),
 	find_path( Intermediate, End, IntermediateRoute, [Intermediate|VisitedNodes], TempLength ),
 	Length is TempLength + Weight,
@@ -84,7 +85,6 @@ print_route([Head | Tail] , Stream) :-
 	write( Stream, ' -> '),
 	print_route(Tail, Stream).
 
-
 find_possible_paths_from_starting_node([ Start | [] ] , TotalSetOfPaths):-
 	setof( [Route, Length], find_path_from_start_vertex( Start, 'G17', Route, [Start], Length ), SetOfPaths),
 	append( SetOfPaths,[], TotalSetOfPaths).
@@ -97,7 +97,6 @@ find_possible_paths_from_starting_node([ Start | Tail] , TotalSetOfPaths):-
 all_possible_paths:-
 	setof(X, startNode(X), SetOfStartingNodes),
 	find_possible_paths_from_starting_node(SetOfStartingNodes, TotalSetOfPaths),
-	
 	open('file.txt', write, Stream),
 	print_all_routes_in_file( TotalSetOfPaths, Stream ),
 	close(Stream),
@@ -159,5 +158,3 @@ print_set_with_minimum( [Head | []] ) :-
 print_set_with_minimum( [Head | Tail] ) :-
 	format('~w -> ', [Head]),
 	print_set_with_minimum( Tail ).
-
-% ['G1', 'G6', 'G8', 'G9', 'G8', 'G7', 'G10', 'G15', 'G13', 'G14', 'G18', 'G17']
