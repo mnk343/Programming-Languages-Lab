@@ -1,0 +1,21 @@
+-- single line comment
+
+{- multi-line comment
+-}
+
+-- IMPORTS
+import Data.List
+
+-- TYPES
+
+-- Bool, Int, Integer, Float, Double, Char, [Char], Tuple
+
+maxInt = maxBound :: Int
+
+mod 9 2
+9 `mod` 2
+
+onelist ++ twolist (concatenate)
+
+zipwith (func) list1 list2
+
